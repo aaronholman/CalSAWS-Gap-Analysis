@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FieldData, AssessmentStatus, FilterState, ProgressStats } from './types';
-import { parseFieldsCSV, groupFieldsByPhase, filterFields } from './utils/csvParser';
+import { groupFieldsByPhase, filterFields } from './utils/csvParser';
 import { assessmentService, Assessment, fieldService, Field } from './lib/supabase';
 import FilterPanel from './components/FilterPanel';
 import ProgressTracker from './components/ProgressTracker';
@@ -50,26 +50,23 @@ const App: React.FC = () => {
     };
   };
 
-  // Load CSV data and assessments on component mount
+  // Load field data and assessments on component mount
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
 
-        // Load CSV data
-        const csvFieldsData = await parseFieldsCSV('/Fields2.csv');
-
-        // Load user-added fields from Supabase
-        let userAddedFields: FieldData[] = [];
+        // Load all fields from Supabase
+        let allFields: FieldData[] = [];
         try {
           const supabaseFields = await fieldService.loadFields();
-          userAddedFields = supabaseFields.map(convertFieldToFieldData);
+          allFields = supabaseFields.map(convertFieldToFieldData);
         } catch (fieldError) {
-          console.warn('Could not load user-added fields from database:', fieldError);
+          console.error('Could not load fields from database:', fieldError);
+          setError('Failed to load field data from database. Please check your connection and try again.');
+          return;
         }
 
-        // Combine CSV and user-added fields
-        const allFields = [...csvFieldsData, ...userAddedFields];
         setFields(allFields);
         setFilteredFields(allFields);
         setGroupedFields(groupFieldsByPhase(allFields));
@@ -93,7 +90,8 @@ const App: React.FC = () => {
         }
 
       } catch (err) {
-        setError('Failed to load field data. Please check that Fields2.csv is available.');
+        console.error('Unexpected error loading data:', err);
+        setError('Failed to load application data. Please try again later.');
       } finally {
         setLoading(false);
       }
