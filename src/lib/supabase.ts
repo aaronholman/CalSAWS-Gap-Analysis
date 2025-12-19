@@ -97,24 +97,13 @@ export const assessmentService = {
       }
 
       // Save note to history if notes exist (after assessment is saved)
-      console.log('🔍 Checking if should save note to history:', {
-        hasData: !!data,
-        hasNotes: !!assessment.notes,
-        hasAuthor: !!assessment.author,
-        notes: assessment.notes,
-        author: assessment.author
-      });
-
       if (data && assessment.notes && assessment.author) {
-        console.log('✅ Calling saveNoteToHistory...');
         await this.saveNoteToHistory(
           assessment.field_name,
           assessment.author,
           assessment.notes,
           assessment.status
         );
-      } else {
-        console.log('❌ Not saving note to history - conditions not met');
       }
 
       return data;
@@ -136,24 +125,13 @@ export const assessmentService = {
       }
 
       // Save note to history if notes exist (after assessment is saved)
-      console.log('🔍 Checking if should save note to history:', {
-        hasData: !!data,
-        hasNotes: !!assessment.notes,
-        hasAuthor: !!assessment.author,
-        notes: assessment.notes,
-        author: assessment.author
-      });
-
       if (data && assessment.notes && assessment.author) {
-        console.log('✅ Calling saveNoteToHistory...');
         await this.saveNoteToHistory(
           assessment.field_name,
           assessment.author,
           assessment.notes,
           assessment.status
         );
-      } else {
-        console.log('❌ Not saving note to history - conditions not met');
       }
 
       return data;
@@ -227,52 +205,29 @@ export const assessmentService = {
 
   // Save a note to history when assessment is saved
   async saveNoteToHistory(fieldName: string, author: string, notes: string, status: string) {
-    console.log('🔍 saveNoteToHistory called with:', {
-      fieldName,
-      author,
-      notes,
-      status,
-      notesLength: notes?.length
-    });
-
-    if (!notes.trim()) {
-      console.log('❌ No notes to save (empty)');
-      return;
-    }
+    if (!notes.trim()) return; // Don't save empty notes
 
     try {
-      console.log('💾 Attempting to save note to history...');
-      const insertData = {
-        field_name: fieldName,
-        author: author.trim(),
-        notes: notes.trim(),
-        assessment_status: status,
-        created_at: new Date().toISOString()
-      };
-      console.log('📝 Insert data:', insertData);
-
       const { data, error } = await supabase
         .from('assessment_notes_history')
-        .insert([insertData])
+        .insert([{
+          field_name: fieldName,
+          author: author.trim(),
+          notes: notes.trim(),
+          assessment_status: status,
+          created_at: new Date().toISOString()
+        }])
         .select()
         .single();
 
       if (error) {
-        console.error('❌ Error saving note to history:', error);
-        console.error('Field name:', fieldName);
-        console.error('Error code:', error.code);
-        console.error('Error message:', error.message);
-        console.error('Error details:', error.details);
-
-        // Don't throw error - just log it so assessment can still save
+        console.error('Error saving note to history:', error);
         return null;
       }
 
-      console.log('✅ Note saved to history successfully:', data);
       return data;
     } catch (err) {
-      console.error('❌ Unexpected error saving note to history:', err);
-      // Don't throw error - just log it so assessment can still save
+      console.error('Unexpected error saving note to history:', err);
       return null;
     }
   }
