@@ -96,8 +96,8 @@ export const assessmentService = {
         throw error;
       }
 
-      // Save note to history if notes exist
-      if (assessment.notes && assessment.author) {
+      // Save note to history if notes exist (after assessment is saved)
+      if (data && assessment.notes && assessment.author) {
         await this.saveNoteToHistory(
           assessment.field_name,
           assessment.author,
@@ -124,8 +124,8 @@ export const assessmentService = {
         throw error;
       }
 
-      // Save note to history if notes exist
-      if (assessment.notes && assessment.author) {
+      // Save note to history if notes exist (after assessment is saved)
+      if (data && assessment.notes && assessment.author) {
         await this.saveNoteToHistory(
           assessment.field_name,
           assessment.author,
@@ -207,24 +207,34 @@ export const assessmentService = {
   async saveNoteToHistory(fieldName: string, author: string, notes: string, status: string) {
     if (!notes.trim()) return; // Don't save empty notes
 
-    const { data, error } = await supabase
-      .from('assessment_notes_history')
-      .insert([{
-        field_name: fieldName,
-        author: author.trim(),
-        notes: notes.trim(),
-        assessment_status: status,
-        created_at: new Date().toISOString()
-      }])
-      .select()
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('assessment_notes_history')
+        .insert([{
+          field_name: fieldName,
+          author: author.trim(),
+          notes: notes.trim(),
+          assessment_status: status,
+          created_at: new Date().toISOString()
+        }])
+        .select()
+        .single();
 
-    if (error) {
-      console.error('Error saving note to history:', error);
-      throw error;
+      if (error) {
+        console.error('Error saving note to history:', error);
+        console.error('Field name:', fieldName);
+        console.error('Error details:', error);
+
+        // Don't throw error - just log it so assessment can still save
+        return null;
+      }
+
+      return data;
+    } catch (err) {
+      console.error('Unexpected error saving note to history:', err);
+      // Don't throw error - just log it so assessment can still save
+      return null;
     }
-
-    return data;
   }
 };
 
