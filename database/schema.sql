@@ -95,6 +95,53 @@ CREATE INDEX IF NOT EXISTS idx_notes_history_created_at ON assessment_notes_hist
 
 -- Insert sample data (optional - remove if not needed)
 -- This can help test the integration
+-- Create fields table for storing user-added field data
+CREATE TABLE IF NOT EXISTS fields (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  field_name VARCHAR(255) NOT NULL UNIQUE,
+  hcfa_box VARCHAR(50),
+  field_requirement VARCHAR(100),
+  short_description TEXT,
+  likely_source VARCHAR(255),
+  primary_need TEXT,
+  additional_note TEXT,
+  phase_or_revenue_cycle VARCHAR(50),
+  cm_system_extract_requirement VARCHAR(255),
+  case_management_system VARCHAR(255),
+  program VARCHAR(255),
+  state VARCHAR(255),
+  frequency_of_data_transfer VARCHAR(255),
+  source VARCHAR(20) DEFAULT 'user_added' CHECK (source IN ('csv', 'user_added')),
+  author VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create index on field_name for faster lookups
+CREATE INDEX IF NOT EXISTS idx_fields_field_name ON fields(field_name);
+
+-- Create index on source for filtering
+CREATE INDEX IF NOT EXISTS idx_fields_source ON fields(source);
+
+-- Create index on phase for filtering
+CREATE INDEX IF NOT EXISTS idx_fields_phase ON fields(phase_or_revenue_cycle);
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE fields ENABLE ROW LEVEL SECURITY;
+
+-- Create policy to allow all operations for now
+CREATE POLICY "Allow all operations on fields" ON fields
+  FOR ALL USING (true);
+
+-- Create trigger to automatically update updated_at for fields
+CREATE TRIGGER update_fields_updated_at
+  BEFORE UPDATE ON fields
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- Update foreign key constraint in assessment_notes_history to handle both CSV and user-added fields
+-- We'll keep it as is since field_name exists in both CSV and fields table
+
 INSERT INTO assessments (field_name, status, notes, author) VALUES
   ('Patient''s Name', 'currently_captured', 'Already captured in CalSAWS patient registration', 'System'),
   ('Insurance Type', 'needs_addition', 'Need to add dropdown for insurance type selection', 'System'),

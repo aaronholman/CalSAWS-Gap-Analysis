@@ -23,6 +23,27 @@ export interface Assessment {
   updated_at?: string;
 }
 
+export interface Field {
+  id?: string;
+  field_name: string;
+  hcfa_box?: string;
+  field_requirement?: string;
+  short_description?: string;
+  likely_source?: string;
+  primary_need?: string;
+  additional_note?: string;
+  phase_or_revenue_cycle?: string;
+  cm_system_extract_requirement?: string;
+  case_management_system?: string;
+  program?: string;
+  state?: string;
+  frequency_of_data_transfer?: string;
+  source?: 'csv' | 'user_added';
+  author: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface NotesHistoryEntry {
   id?: string;
   field_name: string;
@@ -180,6 +201,93 @@ export const assessmentService = {
 
     if (error) {
       console.error('Error saving note to history:', error);
+      throw error;
+    }
+
+    return data;
+  }
+};
+
+// Field service for managing user-added fields
+export const fieldService = {
+  // Load all fields from Supabase
+  async loadFields(): Promise<Field[]> {
+    const { data, error } = await supabase
+      .from('fields')
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Error loading fields:', error);
+      throw error;
+    }
+
+    return data || [];
+  },
+
+  // Save a new field to Supabase
+  async saveField(field: Omit<Field, 'id' | 'created_at' | 'updated_at'>): Promise<Field> {
+    const { data, error } = await supabase
+      .from('fields')
+      .insert([{
+        ...field,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving field:', error);
+      throw error;
+    }
+
+    return data;
+  },
+
+  // Update an existing field
+  async updateField(fieldName: string, updates: Partial<Field>): Promise<Field> {
+    const { data, error } = await supabase
+      .from('fields')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('field_name', fieldName)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating field:', error);
+      throw error;
+    }
+
+    return data;
+  },
+
+  // Delete a field
+  async deleteField(fieldName: string) {
+    const { error } = await supabase
+      .from('fields')
+      .delete()
+      .eq('field_name', fieldName);
+
+    if (error) {
+      console.error('Error deleting field:', error);
+      throw error;
+    }
+  },
+
+  // Get field by name
+  async getField(fieldName: string): Promise<Field | null> {
+    const { data, error } = await supabase
+      .from('fields')
+      .select('*')
+      .eq('field_name', fieldName)
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+      console.error('Error getting field:', error);
       throw error;
     }
 

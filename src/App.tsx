@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FieldData, AssessmentStatus, FilterState, ProgressStats } from './types';
 import { parseFieldsCSV, groupFieldsByPhase, filterFields } from './utils/csvParser';
-import { assessmentService, Assessment } from './lib/supabase';
+import { assessmentService, Assessment, fieldService, Field } from './lib/supabase';
 import FilterPanel from './components/FilterPanel';
 import ProgressTracker from './components/ProgressTracker';
 import RevenueColumn from './components/RevenueColumn';
@@ -31,6 +31,25 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Helper function to convert Supabase Field to FieldData
+  const convertFieldToFieldData = (field: Field): FieldData => {
+    return {
+      'Field Name': field.field_name,
+      'HCFA Box #': field.hcfa_box || '',
+      'Field Requirement': field.field_requirement || '',
+      'Short Description': field.short_description || '',
+      'Likely Source': field.likely_source || '',
+      'Primary Need': field.primary_need || '',
+      'Additional Note': field.additional_note || '',
+      'Phase or Revenue Cycle': field.phase_or_revenue_cycle || '',
+      'CM System Extract Requirement': field.cm_system_extract_requirement || '',
+      'Case Management System': field.case_management_system || '',
+      'Program': field.program || '',
+      'State': field.state || '',
+      'Frequency of Data Transfer': field.frequency_of_data_transfer || ''
+    };
+  };
+
   // Load CSV data and assessments on component mount
   useEffect(() => {
     const loadData = async () => {
@@ -38,10 +57,22 @@ const App: React.FC = () => {
         setLoading(true);
 
         // Load CSV data
-        const fieldsData = await parseFieldsCSV('/Fields2.csv');
-        setFields(fieldsData);
-        setFilteredFields(fieldsData);
-        setGroupedFields(groupFieldsByPhase(fieldsData));
+        const csvFieldsData = await parseFieldsCSV('/Fields2.csv');
+
+        // Load user-added fields from Supabase
+        let userAddedFields: FieldData[] = [];
+        try {
+          const supabaseFields = await fieldService.loadFields();
+          userAddedFields = supabaseFields.map(convertFieldToFieldData);
+        } catch (fieldError) {
+          console.warn('Could not load user-added fields from database:', fieldError);
+        }
+
+        // Combine CSV and user-added fields
+        const allFields = [...csvFieldsData, ...userAddedFields];
+        setFields(allFields);
+        setFilteredFields(allFields);
+        setGroupedFields(groupFieldsByPhase(allFields));
 
         // Load assessments from Supabase
         try {
@@ -184,7 +215,29 @@ const App: React.FC = () => {
 
   const handleAddField = async (fieldData: any) => {
     try {
-      // Create new field object matching FieldData structure
+      // Create new field object for Supabase
+      const newFieldForSupabase: Omit<Field, 'id' | 'created_at' | 'updated_at'> = {
+        field_name: fieldData.elementName,
+        hcfa_box: fieldData.hcfaBox,
+        field_requirement: fieldData.fieldRequirement,
+        short_description: fieldData.shortDescription,
+        likely_source: fieldData.likelySource,
+        primary_need: fieldData.primaryNeed.join(', '),
+        additional_note: fieldData.implementationNotes,
+        phase_or_revenue_cycle: fieldData.phase,
+        cm_system_extract_requirement: '',
+        case_management_system: '',
+        program: '',
+        state: '',
+        frequency_of_data_transfer: fieldData.dataFrequency,
+        source: 'user_added',
+        author: fieldData.author
+      };
+
+      // Save field to Supabase first
+      await fieldService.saveField(newFieldForSupabase);
+
+      // Create FieldData object for local state
       const newField: FieldData = {
         'Field Name': fieldData.elementName,
         'HCFA Box #': fieldData.hcfaBox,
