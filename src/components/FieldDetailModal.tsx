@@ -321,18 +321,17 @@ const FieldDetailModal: React.FC<FieldDetailModalProps> = ({
           </div>
 
           {/* View Notes Toggle */}
-          {notesHistory.length > 0 && (
-            <div className="form-group mb-md">
-              <label className="d-flex align-items-center gap-sm" style={{ cursor: 'pointer' }}>
-                <input
-                  type="checkbox"
-                  checked={showNotesHistory}
-                  onChange={(e) => setShowNotesHistory(e.target.checked)}
-                />
-                <span className="form-label" style={{ margin: 0 }}>View Notes History ({notesHistory.length})</span>
-              </label>
+          <div className="form-group mb-md">
+            <label className="d-flex align-items-center gap-sm" style={{ cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={showNotesHistory}
+                onChange={(e) => setShowNotesHistory(e.target.checked)}
+              />
+              <span className="form-label" style={{ margin: 0 }}>View Notes History ({notesHistory.length})</span>
+            </label>
 
-              {showNotesHistory && (
+            {showNotesHistory && (
                 <div style={{
                   marginTop: 'var(--spacing-md)',
                   border: '1px solid #DEE2E6',
@@ -377,7 +376,19 @@ const FieldDetailModal: React.FC<FieldDetailModalProps> = ({
                       </tr>
                     </thead>
                     <tbody>
-                      {notesHistory.map((note) => (
+                      {notesHistory.length === 0 ? (
+                        <tr>
+                          <td colSpan={3} style={{
+                            padding: 'var(--spacing-md)',
+                            textAlign: 'center',
+                            fontStyle: 'italic',
+                            color: '#6c757d'
+                          }}>
+                            No notes history yet. Add a comment above to start tracking notes.
+                          </td>
+                        </tr>
+                      ) : (
+                        notesHistory.map((note) => (
                         <tr key={note.id}>
                           <td style={{
                             padding: 'var(--spacing-sm)',
@@ -403,13 +414,13 @@ const FieldDetailModal: React.FC<FieldDetailModalProps> = ({
                             {note.notes}
                           </td>
                         </tr>
-                      ))}
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
               )}
             </div>
-          )}
 
           {/* Author Input */}
           <div className="form-group mb-md">
