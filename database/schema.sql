@@ -26,8 +26,17 @@ ALTER TABLE assessments ENABLE ROW LEVEL SECURITY;
 
 -- Create policy to allow all operations for now (you can restrict this later)
 -- For development/demo purposes, allowing all access
-CREATE POLICY "Allow all operations on assessments" ON assessments
-  FOR ALL USING (true);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'assessments'
+    AND policyname = 'Allow all operations on assessments'
+  ) THEN
+    CREATE POLICY "Allow all operations on assessments" ON assessments
+      FOR ALL USING (true);
+  END IF;
+END $$;
 
 -- Create function to automatically update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -39,6 +48,7 @@ END;
 $$ language 'plpgsql';
 
 -- Create trigger to automatically update updated_at
+DROP TRIGGER IF EXISTS update_assessments_updated_at ON assessments;
 CREATE TRIGGER update_assessments_updated_at
   BEFORE UPDATE ON assessments
   FOR EACH ROW
@@ -130,10 +140,20 @@ CREATE INDEX IF NOT EXISTS idx_fields_phase ON fields(phase_or_revenue_cycle);
 ALTER TABLE fields ENABLE ROW LEVEL SECURITY;
 
 -- Create policy to allow all operations for now
-CREATE POLICY "Allow all operations on fields" ON fields
-  FOR ALL USING (true);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'fields'
+    AND policyname = 'Allow all operations on fields'
+  ) THEN
+    CREATE POLICY "Allow all operations on fields" ON fields
+      FOR ALL USING (true);
+  END IF;
+END $$;
 
 -- Create trigger to automatically update updated_at for fields
+DROP TRIGGER IF EXISTS update_fields_updated_at ON fields;
 CREATE TRIGGER update_fields_updated_at
   BEFORE UPDATE ON fields
   FOR EACH ROW
