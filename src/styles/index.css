@@ -1,0 +1,295 @@
+/* Health Co-Lab Design System - CalSAWS Gap Analysis Tool */
+:root {
+  /* Primary Colors */
+  --color-primary-black: #000000;
+  --color-primary-white: #FFFFFF;
+  --color-accent-orange: #FF6909;
+
+  /* Assessment Status Colors */
+  --color-captured: #28A745;
+  --color-needs-addition: #FF6909;
+  --color-edit-requested: #FFC107;
+  --color-investigation: #007BFF;
+  --color-not-assessed: #6C757D;
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --font-size-base: 14px;
+  --font-size-field: 16px;
+  --font-size-header: 24px;
+  --line-height-base: 1.5;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* Border Radius */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--color-primary-black);
+  background-color: var(--color-primary-white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: var(--spacing-md);
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+h5 { font-size: 1.125rem; }
+h6 { font-size: 1rem; }
+
+p {
+  margin-bottom: var(--spacing-md);
+}
+
+/* Button Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn:focus {
+  outline: 2px solid var(--color-accent-orange);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background-color: var(--color-accent-orange);
+  color: var(--color-primary-white);
+}
+
+.btn-primary:hover {
+  background-color: #E55A08;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: var(--color-primary-white);
+  color: var(--color-primary-black);
+  border: 1px solid var(--color-not-assessed);
+}
+
+.btn-secondary:hover {
+  background-color: #F8F9FA;
+  border-color: var(--color-primary-black);
+}
+
+/* Card Styles */
+.card {
+  background-color: var(--color-primary-white);
+  border: 1px solid #E9ECEF;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Badge Styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-captured {
+  background-color: var(--color-captured);
+  color: var(--color-primary-white);
+}
+
+.badge-needs-addition {
+  background-color: var(--color-needs-addition);
+  color: var(--color-primary-white);
+}
+
+.badge-investigation {
+  background-color: var(--color-investigation);
+  color: var(--color-primary-white);
+}
+
+.badge-not-assessed {
+  background-color: var(--color-not-assessed);
+  color: var(--color-primary-white);
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.form-label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: var(--spacing-xs);
+}
+
+.form-input {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 1px solid #DEE2E6;
+  border-radius: var(--border-radius-sm);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  transition: border-color 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-accent-orange);
+  box-shadow: 0 0 0 2px rgba(255, 105, 9, 0.2);
+}
+
+.form-textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Toggle Styles */
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid #DEE2E6;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-primary-white);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+}
+
+.toggle:hover {
+  border-color: var(--color-accent-orange);
+}
+
+.toggle.active {
+  background-color: var(--color-accent-orange);
+  color: var(--color-primary-white);
+  border-color: var(--color-accent-orange);
+}
+
+/* Layout Utilities */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 calc(var(--spacing-sm) * -1);
+}
+
+.col {
+  flex: 1;
+  padding: 0 var(--spacing-sm);
+  min-width: 0;
+}
+
+.col-3 {
+  flex: 0 0 33.333333%;
+  max-width: 33.333333%;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.gap-sm {
+  gap: var(--spacing-sm);
+}
+
+.gap-md {
+  gap: var(--spacing-md);
+}
+
+/* Spacing Utilities */
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+.p-sm { padding: var(--spacing-sm); }
+.p-md { padding: var(--spacing-md); }
+.p-lg { padding: var(--spacing-lg); }
+
+/* Text Utilities */
+.text-center { text-align: center; }
+.text-muted { color: var(--color-not-assessed); }
+.text-small { font-size: 12px; }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .col-3 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .container {
+    padding: 0 var(--spacing-sm);
+  }
+
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+}
