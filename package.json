@@ -18,7 +18,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "import-csv": "node scripts/import-csv-to-supabase.js"
+    "import-csv": "node scripts/import-csv-to-supabase.js",
+    "convert-csv": "node scripts/convert-csv-headers.js",
+    "dedupe-csv": "node scripts/deduplicate-csv.js"
   },
   "eslintConfig": {
     "extends": [

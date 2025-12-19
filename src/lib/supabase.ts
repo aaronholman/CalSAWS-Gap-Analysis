@@ -96,6 +96,16 @@ export const assessmentService = {
         throw error;
       }
 
+      // Save note to history if notes exist
+      if (assessment.notes && assessment.author) {
+        await this.saveNoteToHistory(
+          assessment.field_name,
+          assessment.author,
+          assessment.notes,
+          assessment.status
+        );
+      }
+
       return data;
     } else {
       // Create new assessment
@@ -112,6 +122,16 @@ export const assessmentService = {
       if (error) {
         console.error('Error creating assessment:', error);
         throw error;
+      }
+
+      // Save note to history if notes exist
+      if (assessment.notes && assessment.author) {
+        await this.saveNoteToHistory(
+          assessment.field_name,
+          assessment.author,
+          assessment.notes,
+          assessment.status
+        );
       }
 
       return data;
